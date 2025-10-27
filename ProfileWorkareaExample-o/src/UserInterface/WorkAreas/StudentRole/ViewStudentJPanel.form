@@ -32,8 +32,8 @@
               </Group>
               <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lblUniId" min="-2" pref="132" max="-2" attributes="0"/>
                   <Component id="txtName" min="-2" pref="146" max="-2" attributes="0"/>
+                  <Component id="lblUniId" min="-2" pref="138" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -94,7 +94,7 @@
               </Group>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblUni" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
-                  <Component id="lblUniId" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lblUniId" alignment="3" min="-2" pref="22" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="26" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -117,9 +117,9 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lblContact" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="txtContact" alignment="3" min="-2" pref="31" max="-2" attributes="0"/>
+                  <Component id="txtContact" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="30" max="32767" attributes="0"/>
+              <EmptySpace pref="39" max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnSave" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnUpdate" alignment="3" min="-2" max="-2" attributes="0"/>
