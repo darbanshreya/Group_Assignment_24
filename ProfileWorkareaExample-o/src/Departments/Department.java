@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Department {
 
     String name;
-    String deptId;
+    String deptId ;
 
 
     public Department(String n) {
@@ -27,7 +27,7 @@ public class Department {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 47 * hash + Objects.hashCode(this.name);
+        hash = 47 * hash + Objects.hashCode(this.name) ;
         hash = 47 * hash + Objects.hashCode(this.deptId);
         return hash;
     }
