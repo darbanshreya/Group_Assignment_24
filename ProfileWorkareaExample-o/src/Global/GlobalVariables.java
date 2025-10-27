@@ -11,6 +11,6 @@ import java.util.List;
  * @author pawag
  */
 public class GlobalVariables {
-        public static List<String> PERSONA_TYPE = List.of("STUDENT", "FACULTY");
+        public static List<String> PERSONA_TYPE = List.of("STUDENT", "FACULTY") ;
     
 }

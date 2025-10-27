@@ -26,7 +26,7 @@ public class GlobalFunctions {
         Random rnd = new Random();
         int result = rnd.nextInt();
         if (result < 0) {
-            result = result * (-1);
+            result = result * (-1)  ;
         }
         return result;
     }
