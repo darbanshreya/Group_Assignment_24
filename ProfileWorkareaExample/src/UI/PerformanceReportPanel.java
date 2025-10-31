@@ -257,7 +257,7 @@ public class PerformanceReportPanel extends javax.swing.JPanel {
             for (int i = 0; i < tableModel.getRowCount(); i++) {
                 writer.println(tableModel.getValueAt(i, 0) + ": " + tableModel.getValueAt(i, 1));
             }
-            JOptionPane.showMessageDialog(this, "Report exported successfully", "Success", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Report exported successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error exporting report: " + e.getMessage(), 
                 "Error", JOptionPane.ERROR_MESSAGE);

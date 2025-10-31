@@ -196,7 +196,7 @@ private Faculty currentFaculty;
         try {
             double score = Double.parseDouble(input.trim());
             if (score < 0 || score > assignment.getMaxPoints()) {
-                JOptionPane.showMessageDialog(this, "Score must be between 0 and " + assignment.getMaxPoints(), 
+                JOptionPane.showMessageDialog(this, "Scoree must be between 0 and " + assignment.getMaxPoints(), 
                     "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
