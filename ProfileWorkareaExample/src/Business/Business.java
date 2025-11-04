@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Business;
 
 import Business.Person.PersonDirectory;
@@ -14,7 +10,9 @@ import Bussiness.Finance.TuitionDirectory;
 
 /**
  * Central class managing all business directories for the Digital University System.
- * @author Shreya
+ * Acts as the master controller connecting Academic, Finance, and Access Control subsystems.
+ *
+ * Author: Shreya Darban
  */
 public class Business {
 
@@ -24,24 +22,24 @@ public class Business {
     private StudentDirectory studentDirectory;
     private UserAccountDirectory userAccountDirectory;
 
-    // Added directories for academic and finance
+    // Academic & Financial modules
     private CourseDirectory courseDirectory;
     private EnrollmentDirectory enrollmentDirectory;
     private TuitionDirectory tuitionDirectory;
 
+    // =================== Constructor ===================
     public Business(String name) {
         this.name = name;
         this.personDirectory = new PersonDirectory();
-        this.employeeDirectory = new EmployeeDirectory(this); // Pass 'this' reference
+        this.employeeDirectory = new EmployeeDirectory(this); // Pass business reference
         this.studentDirectory = new StudentDirectory();
         this.userAccountDirectory = new UserAccountDirectory();
         this.courseDirectory = new CourseDirectory();
-        this.enrollmentDirectory = new EnrollmentDirectory();
         this.tuitionDirectory = new TuitionDirectory();
+        this.enrollmentDirectory = new EnrollmentDirectory(this); // ✅ FIX: Pass 'this'
     }
 
-    // ============ Getters ============
-
+    // =================== Getters ===================
     public String getName() {
         return name;
     }
@@ -74,8 +72,7 @@ public class Business {
         return tuitionDirectory;
     }
 
-    // ============ Setters (if needed) ============
-
+    // =================== Setters (optional) ===================
     public void setCourseDirectory(CourseDirectory courseDirectory) {
         this.courseDirectory = courseDirectory;
     }

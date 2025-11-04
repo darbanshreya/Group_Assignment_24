@@ -12,6 +12,9 @@ package UserInterface.WorkAreas.StudentRole;
 
 import Business.Business;
 import Business.Profiles.StudentProfile;
+import java.awt.CardLayout;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -20,9 +23,10 @@ import javax.swing.JPanel;
  */
 public class StudentWorkAreaJPanel extends javax.swing.JPanel {
 
-    javax.swing.JPanel CardSequencePanel;
-    Business business;
-    StudentProfile student;
+    private JPanel CardSequencePanel;
+    private Business business;
+    private StudentProfile student;
+    private javax.swing.JFrame mainFrame;
 
     /**
      * Creates new form UnitRiskWorkArea
@@ -31,14 +35,15 @@ public class StudentWorkAreaJPanel extends javax.swing.JPanel {
      * @param clp
      */
 
-    public StudentWorkAreaJPanel(Business b, StudentProfile spp, JPanel clp) {
+public StudentWorkAreaJPanel(Business business, StudentProfile student, JPanel cardPanel, JFrame mainFrame) {
+    initComponents();
+    this.business = business;
+    this.student = student;
+    this.CardSequencePanel = cardPanel;  // ✅ Store it for button navigation
+    this.mainFrame = mainFrame;
+}
 
-        business = b;
-        this.CardSequencePanel = clp;
-        student = spp;
-        initComponents();
 
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -188,35 +193,57 @@ public class StudentWorkAreaJPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnCourseWorkIdentifyResourceAssetsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCourseWorkIdentifyResourceAssetsActionPerformed
-        
+        CourseWorkJPanel panel = new CourseWorkJPanel(business, student, CardSequencePanel);
+        CardSequencePanel.add("CourseWorkJPanel", panel);
+        ((CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
 
     }//GEN-LAST:event_btnCourseWorkIdentifyResourceAssetsActionPerformed
 
     private void btnManageProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnManageProfileActionPerformed
         // TODO add your handling code here:
-
-
-
+       ManageStudentProfileJPanel panel = new ManageStudentProfileJPanel(business, student, mainFrame);
+    CardSequencePanel.add("ManageStudentProfileJPanel", panel);
+    ((CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
 }//GEN-LAST:event_btnManageProfileActionPerformed
 
     private void btnGraduationAuditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGraduationAuditActionPerformed
         // TODO add your handling code here:
+        GraduationJPanel panel = new GraduationJPanel(business, student, CardSequencePanel);
+CardSequencePanel.add("GraduationJPanel", panel);
+((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
 
 
     }//GEN-LAST:event_btnGraduationAuditActionPerformed
 
     private void btnTuitionFeesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTuitionFeesActionPerformed
         // TODO add your handling code here:
+       FinanceJPanel panel = new FinanceJPanel(business, student, CardSequencePanel);
+       CardSequencePanel.add("FinanceJPanel", panel);
+       ((CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
 
-        CardSequencePanel.removeAll();
+        
 }//GEN-LAST:event_btnTuitionFeesActionPerformed
 
     private void btnTranscriptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTranscriptActionPerformed
         // TODO add your handling code here:
+    if (business.getTuitionDirectory().getTotalTuitionForStudent(student) > 0) {
+    JOptionPane.showMessageDialog(this, 
+        "Please pay your tuition balance before viewing your transcript.",
+        "Access Denied", JOptionPane.WARNING_MESSAGE);
+    return;
+}
+    TranscriptJPanel panel = new TranscriptJPanel(business, student, CardSequencePanel);
+    CardSequencePanel.add("TranscriptJPanel", panel);
+    ((CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
+    
     }//GEN-LAST:event_btnTranscriptActionPerformed
 
     private void btnRegistrationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrationActionPerformed
         // TODO add your handling code here:
+         CourseRegistrationJPanel panel = new CourseRegistrationJPanel(business, student, CardSequencePanel);
+        CardSequencePanel.add("CourseRegistrationJPanel", panel);
+        ((CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
+    
     }//GEN-LAST:event_btnRegistrationActionPerformed
 
 

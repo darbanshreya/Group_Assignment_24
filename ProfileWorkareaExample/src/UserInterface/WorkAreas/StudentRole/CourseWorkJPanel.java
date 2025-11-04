@@ -3,20 +3,106 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package UserInterface.WorkAreas.StudentRole;
-
+import Business.Business;
+import Business.Profiles.StudentProfile;
+import Model.Course;
+import Bussiness.Academic.Enrollment;
+import Bussiness.Academic.EnrollmentDirectory;
+import java.awt.CardLayout;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
 /**
  *
- * @author HP
+ * @author Shreya
  */
 public class CourseWorkJPanel extends javax.swing.JPanel {
-
+    private Business business;
+    private StudentProfile student;
+    private JPanel cardPanel;
+    private EnrollmentDirectory enrollmentDirectory;
     /**
      * Creates new form CourseWorkJPanel
      */
-    public CourseWorkJPanel() {
-        initComponents();
+    public CourseWorkJPanel(Business business, StudentProfile student, JPanel cardPanel) {
+    initComponents();
+
+    // ✅ Correct parameter initialization
+    this.business = business;
+    this.student = student;
+    this.cardPanel = cardPanel;
+    this.enrollmentDirectory = business.getEnrollmentDirectory();
+
+    // ✅ Initialize combo & table
+    populateCourses();
+    populatetblCourseWork();
+
+    // ✅ Progress bar defaults
+    jProgressBar1.setValue(0);
+    jProgressBar1.setStringPainted(true);
+}
+
+    private void populateCourses() {
+    ComboboxCourses.removeAllItems();
+
+    ArrayList<Enrollment> enrollments = enrollmentDirectory.getEnrollmentsByStudent(student);
+    if (enrollments.isEmpty()) {
+        ComboboxCourses.addItem("No enrolled courses");
+        return;
     }
 
+    for (Enrollment e : enrollments) {
+        Course c = e.getCourse();
+        ComboboxCourses.addItem(c.getCourseId() + " - " + c.getCourseName());
+    }
+}
+
+     private void populatetblCourseWork() 
+     {
+    DefaultTableModel model = (DefaultTableModel) tblCourseWork.getModel();
+    model.setRowCount(0); // clear table
+
+    String selectedCourse = (String) ComboboxCourses.getSelectedItem();
+    if (selectedCourse == null || selectedCourse.equals("No enrolled courses")) return;
+
+    Object[][] assignments = {
+        {selectedCourse, "Assignment 1", "2025-11-10", "-"},
+        {selectedCourse, "Quiz 1", "2025-11-17", "-"},
+        {selectedCourse, "Midterm", "2025-11-25", "-"},
+        {selectedCourse, "Final Project", "2025-12-05", "-"}
+    };
+
+    for (Object[] row : assignments) {
+        model.addRow(row);
+    }
+
+    updateProgress();
+    }
+
+     private void updateProgress()
+     {
+    int total = tblCourseWork.getRowCount();
+    if (total == 0) {
+        jProgressBar1.setValue(0);
+        jProgressBar1.setString("0% Completed");
+        return;
+    }
+
+    int completed = 0;
+    for (int i = 0; i < total; i++) {
+        String status = (String) tblCourseWork.getValueAt(i, 3);
+        if (status != null && (status.equalsIgnoreCase("Submitted") || !status.equals("-"))) {
+            completed++;
+        }
+    }
+
+    int percent = (int) ((completed / (double) total) * 100);
+    jProgressBar1.setValue(percent);
+    jProgressBar1.setString(percent + "% Completed");
+  }
+
+     
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -26,27 +112,37 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox<>();
+        ComboboxCourses = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
+        lblSelectedCourse = new javax.swing.JLabel();
         btnBack = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblCourseWork = new javax.swing.JTable();
         btnSubmit = new javax.swing.JButton();
         btnViewGrade = new javax.swing.JButton();
         jProgressBar1 = new javax.swing.JProgressBar();
-        jLabel3 = new javax.swing.JLabel();
+        lblProgressBar = new javax.swing.JLabel();
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboboxCourses.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ComboboxCourses.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ComboboxCoursesActionPerformed(evt);
+            }
+        });
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel1.setText("My Coursework  ");
 
-        jLabel2.setText("Selected Course:");
+        lblSelectedCourse.setText("Selected Course:");
 
         btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblCourseWork.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -57,7 +153,7 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
                 "Course", "Assignment", "Due Date", "Grade"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tblCourseWork);
 
         btnSubmit.setText("Submit");
         btnSubmit.addActionListener(new java.awt.event.ActionListener() {
@@ -67,8 +163,13 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
         });
 
         btnViewGrade.setText("View Grade");
+        btnViewGrade.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnViewGradeActionPerformed(evt);
+            }
+        });
 
-        jLabel3.setText("Progress Bar");
+        lblProgressBar.setText("Progress Bar");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -78,22 +179,21 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(45, 45, 45)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(441, 441, 441)
-                                .addComponent(btnBack))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel2)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jLabel3)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(211, 211, 211)))))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(lblSelectedCourse)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(ComboboxCourses, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lblProgressBar)
+                                .addGap(18, 18, 18)
+                                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(211, 211, 211))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(301, 301, 301)
                         .addComponent(btnSubmit)
@@ -109,11 +209,12 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
                     .addComponent(btnBack)
                     .addComponent(jLabel1))
                 .addGap(27, 27, 27)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblSelectedCourse, javax.swing.GroupLayout.PREFERRED_SIZE, 21, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ComboboxCourses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblProgressBar)))
                 .addGap(26, 26, 26)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -126,19 +227,70 @@ public class CourseWorkJPanel extends javax.swing.JPanel {
 
     private void btnSubmitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSubmitActionPerformed
         // TODO add your handling code here:
+        int row = tblCourseWork.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select an assignment to submit.");
+            return;
+        }
+
+        tblCourseWork.setValueAt("Submitted", row, 3);
+        updateProgress();
+
+        JOptionPane.showMessageDialog(this,
+                "Assignment submitted successfully!",
+                "Submission Successful",
+                JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnSubmitActionPerformed
+
+    private void btnViewGradeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewGradeActionPerformed
+        // TODO add your handling code here:
+        int row = tblCourseWork.getSelectedRow();
+        if (row < 0) {
+            JOptionPane.showMessageDialog(this, "Please select an assignment first.");
+            return;
+        }
+
+        String assignment = (String) tblCourseWork.getValueAt(row, 1);
+        String grade = (String) tblCourseWork.getValueAt(row, 3);
+
+        if (grade.equals("-") || grade.equals("Submitted")) {
+            JOptionPane.showMessageDialog(this,
+                    "Grade for " + assignment + " is not yet available.",
+                    "Grade Status",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Grade for " + assignment + ": " + grade,
+                    "Grade Details",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    }//GEN-LAST:event_btnViewGradeActionPerformed
+
+    private void ComboboxCoursesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboboxCoursesActionPerformed
+        // TODO add your handling code here:
+          populatetblCourseWork();
+          lblSelectedCourse.setText("Selected Course: " + ComboboxCourses.getSelectedItem());
+    }//GEN-LAST:event_ComboboxCoursesActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+        cardPanel.remove(this);
+        CardLayout layout = (CardLayout) cardPanel.getLayout();
+        layout.previous(cardPanel);
+    }//GEN-LAST:event_btnBackActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> ComboboxCourses;
     private javax.swing.JButton btnBack;
     private javax.swing.JButton btnSubmit;
     private javax.swing.JButton btnViewGrade;
-    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel lblProgressBar;
+    private javax.swing.JLabel lblSelectedCourse;
+    private javax.swing.JTable tblCourseWork;
     // End of variables declaration//GEN-END:variables
 }

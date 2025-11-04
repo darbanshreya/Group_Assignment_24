@@ -1,60 +1,46 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Bussiness.Academic;
 
 import java.util.ArrayList;
+import Model.Course;
 
 /**
  * Manages all courses in the Digital University System.
- * @author HP
+ * Provides utilities to search, add, and manage courses.
+ *
+ * Author: Shreya Darban
  */
 public class CourseDirectory {
+
     private ArrayList<Course> courseList;
-    
+
     public CourseDirectory() {
         courseList = new ArrayList<>();
     }
-    
-    /**
-     * Add a new course to the directory
-     * @param courseId Course code (e.g., INFO5100)
-     * @param courseName Course name
-     * @param instructor Instructor name
-     * @param credits Number of credits
-     * @param semester Semester (e.g., Fall 2025)
-     * @param capacity Maximum enrollment capacity
-     * @return The newly created Course object
-     */
-    public Course addCourse(String courseId, String courseName, String instructor, 
-                           int credits, String semester, int capacity) {
-        Course c = new Course(courseId, courseName, instructor, credits, semester, capacity);
+
+    /** Add a new course to the directory. */
+    public Course addCourse(String courseId, String courseName, String faculty,
+                            int credits, String term, int totalSeats) {
+
+        double defaultTuition = 2500.0; // default per-course tuition
+        Course c = new Course(courseId, courseName, term, credits, defaultTuition);
+        c.setFaculty(faculty);
+        c.setTotalSeats(totalSeats);
+        c.setAvailableSeats(totalSeats);
         courseList.add(c);
         return c;
     }
-    
-    /**
-     * Get all courses
-     * @return ArrayList of all courses
-     */
+
+    /** Get all available courses. */
     public ArrayList<Course> getCourseList() {
         return courseList;
     }
-    
-    /**
-     * Remove a course from the directory
-     * @param c Course to remove
-     */
+
+    /** Remove a course from the directory. */
     public void removeCourse(Course c) {
         courseList.remove(c);
     }
-    
-    /**
-     * Find a course by its ID
-     * @param courseId Course ID to search for
-     * @return Course if found, null otherwise
-     */
+
+    /** Find a course by its ID. */
     public Course findCourse(String courseId) {
         for (Course c : courseList) {
             if (c.getCourseId().equalsIgnoreCase(courseId)) {
@@ -63,42 +49,42 @@ public class CourseDirectory {
         }
         return null;
     }
-    
-    /**
-     * Search courses by semester
-     * @param semester Semester to filter by
-     * @return ArrayList of courses in that semester
-     */
-    public ArrayList<Course> searchBySemester(String semester) {
+
+    /** Search for courses by Course ID. */
+    public ArrayList<Course> searchByCourseId(String courseId) {
         ArrayList<Course> results = new ArrayList<>();
         for (Course c : courseList) {
-            if (c.getSemester().equalsIgnoreCase(semester)) {
+            if (c.getCourseId().toLowerCase().contains(courseId.toLowerCase())) {
                 results.add(c);
             }
         }
         return results;
     }
-    
-    /**
-     * Search courses by instructor name
-     * @param instructor Instructor name to search for
-     * @return ArrayList of courses taught by that instructor
-     */
-    public ArrayList<Course> searchByInstructor(String instructor) {
+
+    /** Search for courses by Term. */
+    public ArrayList<Course> searchByTerm(String term) {
         ArrayList<Course> results = new ArrayList<>();
         for (Course c : courseList) {
-            if (c.getInstructor().toLowerCase().contains(instructor.toLowerCase())) {
+            if (c.getTerm().equalsIgnoreCase(term)) {
                 results.add(c);
             }
         }
         return results;
     }
-    
-    /**
-     * Search courses by course name
-     * @param courseName Course name to search for
-     * @return ArrayList of matching courses
-     */
+
+    /** Search for courses by Faculty (Instructor name). */
+    public ArrayList<Course> searchByFaculty(String faculty) {
+        ArrayList<Course> results = new ArrayList<>();
+        for (Course c : courseList) {
+            if (c.getFaculty() != null &&
+                c.getFaculty().toLowerCase().contains(faculty.toLowerCase())) {
+                results.add(c);
+            }
+        }
+        return results;
+    }
+
+    /** Search for courses by Course Name. */
     public ArrayList<Course> searchByCourseName(String courseName) {
         ArrayList<Course> results = new ArrayList<>();
         for (Course c : courseList) {
@@ -108,11 +94,8 @@ public class CourseDirectory {
         }
         return results;
     }
-    
-    /**
-     * Get total number of courses
-     * @return Count of courses
-     */
+
+    /** Get total number of courses in the directory. */
     public int getTotalCourses() {
         return courseList.size();
     }

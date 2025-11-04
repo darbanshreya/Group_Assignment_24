@@ -3,19 +3,57 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
 package UserInterface.WorkAreas.StudentRole;
+import Business.Business;
+import Business.Profiles.StudentProfile;
+import Bussiness.Finance.TuitionDirectory;
+import java.awt.CardLayout;
+import java.text.DecimalFormat;
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import Bussiness.Finance.TuitionDirectory.Payment; // ✅ Add this import
+import java.util.List;                              // ✅ Add this import
+
+
 
 /**
  *
  * @author HP
  */
 public class FinanceJPanel extends javax.swing.JPanel {
+     
+    private Business business;
+    private StudentProfile student;
+    private TuitionDirectory tuitionDirectory;
+    private DecimalFormat df = new DecimalFormat("#,##0.00");
+    private JPanel cardPanel; // ✅ Added this line
+
 
     /**
      * Creates new form FinanceJPanel
      */
-    public FinanceJPanel() {
-        initComponents();
-    }
+   public FinanceJPanel(Business business, StudentProfile student, JPanel cardPanel) {
+    initComponents();
+    this.business = business;
+    this.student = student;
+    this.cardPanel = cardPanel; // ✅ Store reference
+    this.tuitionDirectory = business.getTuitionDirectory();
+    tuitionDirectory.initializeStudentAccount(student);
+
+    updateCurrentBalance();
+    populatePaymentHistory();
+}
+
+
+    // ✅ Updates the Current Balance label
+private void updateCurrentBalance() {
+    double balance = tuitionDirectory.getTotalTuitionForStudent(student);
+    lblCurrentBalance.setText("Current Balance: $" + df.format(balance));
+}
+// ✅ Populates the payment history table (optional demo or data-driven)
+
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -36,6 +74,7 @@ public class FinanceJPanel extends javax.swing.JPanel {
         btnPayFullBalance = new javax.swing.JButton();
         btnPayAmount = new javax.swing.JButton();
         btnRefund = new javax.swing.JButton();
+        btnBack = new javax.swing.JButton();
 
         lblTuitionPayment.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         lblTuitionPayment.setText("Tuition Payment");
@@ -43,6 +82,12 @@ public class FinanceJPanel extends javax.swing.JPanel {
         lblCurrentBalance.setText("Current Balance: $");
 
         lblPaymentAmount.setText("Payment Amount:");
+
+        fieldPaymentAmount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldPaymentAmountActionPerformed(evt);
+            }
+        });
 
         lblPaymentHistory.setText("Payment History");
 
@@ -60,10 +105,32 @@ public class FinanceJPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tblPaymentHistory);
 
         btnPayFullBalance.setText("Pay Full Balance");
+        btnPayFullBalance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPayFullBalanceActionPerformed(evt);
+            }
+        });
 
         btnPayAmount.setText("Pay Amount");
+        btnPayAmount.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPayAmountActionPerformed(evt);
+            }
+        });
 
         btnRefund.setText("Refund");
+        btnRefund.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRefundActionPerformed(evt);
+            }
+        });
+
+        btnBack.setText("Back");
+        btnBack.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -72,7 +139,6 @@ public class FinanceJPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(42, 42, 42)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTuitionPayment)
                     .addComponent(lblCurrentBalance)
                     .addComponent(lblPaymentHistory)
                     .addGroup(layout.createSequentialGroup()
@@ -86,14 +152,21 @@ public class FinanceJPanel extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnRefund, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(fieldPaymentAmount, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 513, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(116, Short.MAX_VALUE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(lblTuitionPayment)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnBack, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 580, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(12, 12, 12)
-                .addComponent(lblTuitionPayment)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblTuitionPayment)
+                    .addComponent(btnBack))
                 .addGap(18, 18, 18)
                 .addComponent(lblCurrentBalance)
                 .addGap(18, 18, 18)
@@ -105,16 +178,109 @@ public class FinanceJPanel extends javax.swing.JPanel {
                     .addComponent(btnPayFullBalance)
                     .addComponent(btnPayAmount)
                     .addComponent(btnRefund))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addComponent(lblPaymentHistory)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 274, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(106, 106, 106))
+                .addGap(129, 129, 129))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnPayFullBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayFullBalanceActionPerformed
+        // TODO add your handling code here:
+       double balance = tuitionDirectory.getTotalTuitionForStudent(student);
+    if (balance <= 0) {
+        JOptionPane.showMessageDialog(this, "No outstanding balance to pay.");
+        return;
+    }
+
+    tuitionDirectory.recordPayment(student, balance, "Full Balance Payment");
+    JOptionPane.showMessageDialog(this, "Full balance of $" + df.format(balance) + " paid successfully!");
+
+    updateCurrentBalance();
+    populatePaymentHistory();
+    }//GEN-LAST:event_btnPayFullBalanceActionPerformed
+
+    private void btnPayAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPayAmountActionPerformed
+        // TODO add your handling code here:
+                                               
+    try {
+        double amount = Double.parseDouble(fieldPaymentAmount.getText().trim());
+        if (amount <= 0) {
+            JOptionPane.showMessageDialog(this, "Enter a valid positive payment amount.");
+            return;
+        }
+
+        double currentBalance = tuitionDirectory.getTotalTuitionForStudent(student);
+        if (amount > currentBalance) {
+            JOptionPane.showMessageDialog(this, "Payment exceeds current balance!");
+            return;
+        }
+
+        // Process payment (you can expand this logic in TuitionDirectory)
+        tuitionDirectory.recordPayment(student, amount, "Manual Payment");
+        JOptionPane.showMessageDialog(this, "Payment of $" + df.format(amount) + " successful!");
+
+        updateCurrentBalance();
+        populatePaymentHistory();
+        fieldPaymentAmount.setText("");
+    } catch (NumberFormatException e) {
+        JOptionPane.showMessageDialog(this, "Please enter a valid amount.");
+    }
+  
+
+    }//GEN-LAST:event_btnPayAmountActionPerformed
+
+    private void btnRefundActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRefundActionPerformed
+        // TODO add your handling code here:
+    double refundAmount = 500.00; // Example fixed refund
+    tuitionDirectory.refundTuition(student, refundAmount);
+    JOptionPane.showMessageDialog(this, "Refund of $" + df.format(refundAmount) + " processed successfully!");
+
+    updateCurrentBalance();
+    populatePaymentHistory();
+    }//GEN-LAST:event_btnRefundActionPerformed
+
+    private void fieldPaymentAmountActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldPaymentAmountActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldPaymentAmountActionPerformed
+
+    private void btnBackActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackActionPerformed
+        // TODO add your handling code here:
+    cardPanel.remove(this); // remove current FinanceJPanel
+    CardLayout layout = (CardLayout) cardPanel.getLayout();
+    layout.previous(cardPanel); // show previous panel (StudentWorkAreaJPanel)
+    }//GEN-LAST:event_btnBackActionPerformed
+    
+    // ✅ Dynamically load payment and refund history for the student
+    private void populatePaymentHistory() {
+    DefaultTableModel model = (DefaultTableModel) tblPaymentHistory.getModel();
+    model.setRowCount(0); // clear table
+
+    try {
+        List<Payment> paymentList = tuitionDirectory.getPaymentsForStudent(student);
+        if (paymentList == null || paymentList.isEmpty()) {
+            model.addRow(new Object[]{"No transactions yet", "-", "-", "-"});
+            return;
+        }
+
+        for (Payment p : paymentList) {
+            String sign = p.getAmount() < 0 ? "Refund" : "Payment";
+            model.addRow(new Object[]{
+                p.getDate(),
+                (p.getAmount() < 0 ? "-$" : "$") + df.format(Math.abs(p.getAmount())),
+                "$" + df.format(p.getBalanceAfter()),
+                sign + " (" + p.getMethod() + ")"
+            });
+        }
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(this, "Error loading payment history: " + e.getMessage());
+    }
+}
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBack;
     private javax.swing.JButton btnPayAmount;
     private javax.swing.JButton btnPayFullBalance;
     private javax.swing.JButton btnRefund;

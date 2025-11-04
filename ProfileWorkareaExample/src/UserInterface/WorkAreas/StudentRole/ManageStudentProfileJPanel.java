@@ -4,17 +4,84 @@
  */
 package UserInterface.WorkAreas.StudentRole;
 
+import Business.Business;
+import Business.Profiles.StudentProfile;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import Business.ProfileWorkAreaMainFrame;
+
+
+
 /**
  *
  * @author HP
  */
 public class ManageStudentProfileJPanel extends javax.swing.JPanel {
+    private Business business;
+    private StudentProfile student;
+    private javax.swing.JFrame mainFrame;
+
 
     /**
      * Creates new form ManageStudentProfileJPanel
      */
-    public ManageStudentProfileJPanel() {
-        initComponents();
+    public ManageStudentProfileJPanel(Business business, StudentProfile student, javax.swing.JFrame mainFrame)
+    {
+    initComponents();
+    this.business = business;
+    this.student = student;
+    this.mainFrame = mainFrame; // ✅ store reference to your main frame
+    loadStudentDetails();
+    setEditableFields(false);
+     }
+
+
+    private void loadStudentDetails() {
+        if (student == null || student.getPerson() == null) {
+            JOptionPane.showMessageDialog(this, "Student data not available.");
+            return;
+        }
+
+        fieldStudentID.setText(student.getPerson().getPersonId());
+        fieldFullName.setText(student.getPerson().getName());
+        fieldEmailID.setText(student.getPerson().getEmail());
+        fieldPhoneNumber.setText(student.getPerson().getPhoneNumber());
+        fieldDepartment.setText(student.getDepartment() != null ? student.getDepartment() : "");
+        fieldProgram.setText(student.getProgram() != null ? student.getProgram() : "");
+    }
+     private void setEditableFields(boolean editable) {
+        fieldFullName.setEditable(editable);
+        fieldEmailID.setEditable(editable);
+        fieldPhoneNumber.setEditable(editable);
+        fieldDepartment.setEditable(editable);
+        fieldProgram.setEditable(editable);
+    }
+
+    // ======== Save Updated Data ========
+    private void saveProfileUpdates() {
+        if (student == null || student.getPerson() == null) return;
+
+        String name = fieldFullName.getText().trim();
+        String email = fieldEmailID.getText().trim();
+        String phone = fieldPhoneNumber.getText().trim();
+        String dept = fieldDepartment.getText().trim();
+        String prog = fieldProgram.getText().trim();
+
+        // Basic validation
+        if (name.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Full Name and Email are required.");
+            return;
+        }
+
+        // Update person details
+        student.getPerson().setName(name);
+        student.getPerson().setEmail(email);
+        student.getPerson().setPhoneNumber(phone);
+        student.setDepartment(dept);
+        student.setProgram(prog);
+
+        JOptionPane.showMessageDialog(this, "Profile updated successfully!");
+        setEditableFields(false);
     }
 
     /**
@@ -27,7 +94,7 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        btnLogout = new javax.swing.JButton();
         lblStudentID = new javax.swing.JLabel();
         lblFullName = new javax.swing.JLabel();
         lblEmailID = new javax.swing.JLabel();
@@ -41,12 +108,17 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
         lblProgram = new javax.swing.JLabel();
         fieldProgram = new javax.swing.JTextField();
         btnUpdate = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setText("My Profile");
 
-        jButton1.setText("Logout");
+        btnLogout.setText("Logout");
+        btnLogout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogoutActionPerformed(evt);
+            }
+        });
 
         lblStudentID.setText("Student ID");
 
@@ -62,9 +134,39 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
             }
         });
 
+        fieldFullName.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldFullNameActionPerformed(evt);
+            }
+        });
+
+        fieldEmailID.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldEmailIDActionPerformed(evt);
+            }
+        });
+
+        fieldPhoneNumber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldPhoneNumberActionPerformed(evt);
+            }
+        });
+
         lblDepartment.setText("Department");
 
+        fieldDepartment.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldDepartmentActionPerformed(evt);
+            }
+        });
+
         lblProgram.setText("Program");
+
+        fieldProgram.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldProgramActionPerformed(evt);
+            }
+        });
 
         btnUpdate.setText("Update");
         btnUpdate.addActionListener(new java.awt.event.ActionListener() {
@@ -73,10 +175,10 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
             }
         });
 
-        jButton3.setText("Save");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnSaveActionPerformed(evt);
             }
         });
 
@@ -88,13 +190,13 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
+                .addComponent(btnLogout)
                 .addGap(130, 130, 130))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(225, 225, 225)
                 .addComponent(btnUpdate)
                 .addGap(123, 123, 123)
-                .addComponent(jButton3)
+                .addComponent(btnSave)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(184, 184, 184)
@@ -122,7 +224,7 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(15, 15, 15)
-                        .addComponent(jButton1))
+                        .addComponent(btnLogout))
                     .addComponent(jLabel1))
                 .addGap(105, 105, 105)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -151,7 +253,7 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
                 .addGap(45, 45, 45)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnUpdate)
-                    .addComponent(jButton3))
+                    .addComponent(btnSave))
                 .addContainerGap(144, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -162,14 +264,60 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUpdateActionPerformed
         // TODO add your handling code here:
+         setEditableFields(true);
+        JOptionPane.showMessageDialog(this, "Edit mode enabled. You can now update your profile.");
     }//GEN-LAST:event_btnUpdateActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+        saveProfileUpdates();
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void fieldFullNameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldFullNameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldFullNameActionPerformed
+
+    private void fieldEmailIDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldEmailIDActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldEmailIDActionPerformed
+
+    private void fieldPhoneNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldPhoneNumberActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldPhoneNumberActionPerformed
+
+    private void fieldDepartmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldDepartmentActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldDepartmentActionPerformed
+
+    private void fieldProgramActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldProgramActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldProgramActionPerformed
+
+    private void btnLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogoutActionPerformed
+        // TODO add your handling code here:
+     int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Are you sure you want to logout?",
+            "Logout Confirmation",
+            JOptionPane.YES_NO_OPTION
+    );
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        JOptionPane.showMessageDialog(this, "You have been logged out successfully.");
+
+        // ✅ Dispose current student window or frame
+        javax.swing.SwingUtilities.getWindowAncestor(this).dispose();
+
+        // ✅ Reopen main login/home frame
+        ProfileWorkAreaMainFrame mainFrame = new ProfileWorkAreaMainFrame();
+        mainFrame.setVisible(true);
+    }
+    }//GEN-LAST:event_btnLogoutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnLogout;
+    private javax.swing.JButton btnSave;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JTextField fieldDepartment;
     private javax.swing.JTextField fieldEmailID;
@@ -177,8 +325,6 @@ public class ManageStudentProfileJPanel extends javax.swing.JPanel {
     private javax.swing.JTextField fieldPhoneNumber;
     private javax.swing.JTextField fieldProgram;
     private javax.swing.JTextField fieldStudentID;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel lblDepartment;

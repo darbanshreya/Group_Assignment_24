@@ -1,23 +1,22 @@
 
 package Business;
 
+
 import Business.Profiles.EmployeeProfile;
-import Business.Profiles.Profile;
 import Business.Profiles.StudentProfile;
 import Business.Profiles.FacultyProfile;
-
+import Business.Profiles.Profile;
 import Business.UserAccounts.UserAccount;
 import Business.UserAccounts.UserAccountDirectory;
+import Business.ConfigureABusiness;
 import Model.Faculty;
 
 import UserInterface.WorkAreas.AdminRole.AdminRoleWorkAreaJPanel;
-import UserInterface.WorkAreas.FacultyRole.FacultyWorkAreaJPanel;
 import UserInterface.WorkAreas.StudentRole.StudentWorkAreaJPanel;
+import UserInterface.WorkAreas.FacultyRole.FacultyWorkAreaJPanel;
 
+import javax.swing.*;
 
-
-import javax.swing.JPanel;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -33,6 +32,8 @@ public class ProfileWorkAreaMainFrame extends javax.swing.JFrame {
     public ProfileWorkAreaMainFrame() {
         initComponents();
         business = ConfigureABusiness.initialize();
+        setTitle("Digital University System - Info 5100");
+        setLocationRelativeTo(null);
     }
 
     public void insert(JPanel jpanel) {
@@ -152,18 +153,28 @@ public class ProfileWorkAreaMainFrame extends javax.swing.JFrame {
         }
         
         if (profile instanceof StudentProfile) {
-            StudentProfile spp = (StudentProfile) profile;
-            StudentWorkAreaJPanel studentworkareajpanel = new StudentWorkAreaJPanel(business, spp, CardSequencePanel);
-            CardSequencePanel.removeAll();
-            CardSequencePanel.add("student", studentworkareajpanel);
-            ((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
-        }
+    StudentProfile studentProfile = (StudentProfile) profile;
+
+    // ✅ Pass correct params and refresh the right-panel only (assignment-compliant)
+    StudentWorkAreaJPanel studentPanel =
+        new StudentWorkAreaJPanel(business, studentProfile, CardSequencePanel, this);
+
+
+    CardSequencePanel.removeAll();
+    CardSequencePanel.add("StudentWorkAreaJPanel", studentPanel);
+    ((java.awt.CardLayout) CardSequencePanel.getLayout()).next(CardSequencePanel);
+
+    JOptionPane.showMessageDialog(this,
+            "Welcome " + studentProfile.getPerson().getName() + "! Logged in as Student.",
+            "Login Successful", JOptionPane.INFORMATION_MESSAGE);
+}
+
 
         if (profile instanceof FacultyProfile) {
             FacultyProfile facultyProfile = (FacultyProfile) profile;
             Faculty faculty = facultyProfile.getFaculty();
             
-            ui.FacultyDashboardFrame facultyDashboard = new ui.FacultyDashboardFrame(faculty);
+            UI.FacultyDashboardFrame facultyDashboard = new UI.FacultyDashboardFrame(faculty);
             facultyDashboard.setVisible(true);
             this.setVisible(false);
         }
@@ -201,10 +212,20 @@ public class ProfileWorkAreaMainFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ProfileWorkAreaMainFrame().setVisible(true);
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
             }
+        } catch (Exception ex) {
+            java.util.logging.Logger.getLogger(ProfileWorkAreaMainFrame.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        }
+
+        java.awt.EventQueue.invokeLater(() -> {
+            new ProfileWorkAreaMainFrame().setVisible(true);
         });
     }
 

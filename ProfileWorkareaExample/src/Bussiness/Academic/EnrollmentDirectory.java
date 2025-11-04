@@ -1,43 +1,106 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Bussiness.Academic;
 
+import Business.Business;
 import Business.Profiles.StudentProfile;
+import Model.Course;
+import Bussiness.Finance.TuitionDirectory;
 import java.util.ArrayList;
 
 /**
- * Manages all enrollments in the Digital University System.
+ * Directory to manage all student enrollments in the Digital University System.
+ * Handles adding, dropping, GPA calculation, seat management, and tuition linkage.
+ *
+ * Author: Shreya Darban
  */
 public class EnrollmentDirectory {
 
     private ArrayList<Enrollment> enrollmentList;
+    private Business business; // ✅ Access to TuitionDirectory and other modules
 
-    public EnrollmentDirectory() {
+    // ✅ Constructor links with Business
+    public EnrollmentDirectory(Business business) {
+        this.business = business;
         enrollmentList = new ArrayList<>();
     }
 
+    /**
+     * ✅ Enrolls a student in a given course and automatically creates a tuition invoice.
+     */
     public Enrollment addEnrollment(StudentProfile student, Course course) {
+        if (student == null || course == null) {
+            throw new IllegalArgumentException("Student or Course cannot be null");
+        }
+
+        // Prevent duplicate enrollment
+        if (isAlreadyEnrolled(student, course)) {
+            System.out.println("Already enrolled in course: " + course.getCourseId());
+            return null;
+        }
+
+        // Optional safeguard: block if unpaid tuition is too high
+        double balance = business.getTuitionDirectory().getTotalTuitionForStudent(student);
+        if (balance > 10000) {
+            System.out.println("Enrollment blocked — unpaid balance exceeds $10,000.");
+            return null;
+        }
+
+        // Proceed with enrollment
         Enrollment e = new Enrollment(student, course);
         enrollmentList.add(e);
-        course.reduceSeat();
-        student.addTuitionCharge(course.getCredits() * 1000.0); // $1000 per credit
+
+        // Reduce seat count if available
+        if (course.hasAvailableSeats()) {
+            course.reduceSeat();
+        }
+
+        System.out.println("Enrollment added for student: "
+                + student.getPerson().getName()
+                + " in course: " + course.getCourseName());
+
+        // ✅ Automatically bill tuition for this course
+        double tuitionFee = course.getTuitionFee(); // <-- fixed here
+        String term = course.getTerm();
+
+        if (tuitionFee > 0) {
+            business.getTuitionDirectory().createInvoice(student, tuitionFee, term);
+            System.out.println("Tuition invoice generated for $" + tuitionFee +
+                    " (" + course.getCourseId() + " - " + term + ")");
+        }
+
         return e;
     }
 
-    public void dropEnrollment(Enrollment e) {
-        if (e != null) {
-            enrollmentList.remove(e);
-            e.getCourse().increaseSeat();
-            e.getStudent().payTuition(-e.getCourse().getCredits() * 1000.0); // refund
+    /**
+     * ✅ Drops a student from a course (if found) and triggers refund logic.
+     */
+    public boolean dropEnrollment(StudentProfile student, Course course) {
+        if (student == null || course == null) return false;
+
+        Enrollment toRemove = null;
+        for (Enrollment e : enrollmentList) {
+            if (e.getStudent().equals(student) && e.getCourse().equals(course)) {
+                toRemove = e;
+                break;
+            }
         }
+
+        if (toRemove != null) {
+            enrollmentList.remove(toRemove);
+            course.increaseSeat();
+
+            System.out.println("Dropped " + course.getCourseId() +
+                    " for " + student.getPerson().getName());
+
+            // ✅ Automatically refund
+            business.getTuitionDirectory().refundTuition(student, course);
+            System.out.println("Refund processed for dropped course: " + course.getCourseId());
+
+            return true;
+        }
+        return false;
     }
 
-    public ArrayList<Enrollment> getEnrollmentList() {
-        return enrollmentList;
-    }
-
+    /** Returns all enrollments for a given student. */
     public ArrayList<Enrollment> getEnrollmentsByStudent(StudentProfile student) {
         ArrayList<Enrollment> results = new ArrayList<>();
         for (Enrollment e : enrollmentList) {
@@ -48,12 +111,66 @@ public class EnrollmentDirectory {
         return results;
     }
 
-    public void removeAllForCourse(Course course) {
-        enrollmentList.removeIf(e -> e.getCourse().equals(course));
+    /** Checks if a student is already enrolled in a course. */
+    public boolean isAlreadyEnrolled(StudentProfile student, Course course) {
+        for (Enrollment e : enrollmentList) {
+            if (e.getStudent().equals(student) && e.getCourse().equals(course)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public int getTotalEnrollments() {
+    /** Gets total credits a student is enrolled in (used for 8-credit cap). */
+    public int getTotalCredits(StudentProfile student) {
+        int totalCredits = 0;
+        for (Enrollment e : enrollmentList) {
+            if (e.getStudent().equals(student)) {
+                totalCredits += e.getCourse().getCredits();
+            }
+        }
+        return totalCredits;
+    }
+
+    /** Returns all enrollments across the university. */
+    public ArrayList<Enrollment> getAllEnrollments() {
+        return enrollmentList;
+    }
+
+    /** Returns total number of enrollments. */
+    public int getEnrollmentCount() {
         return enrollmentList.size();
     }
-}
 
+    /** ✅ Calculates GPA for a student (used in TranscriptJPanel). */
+    public double calculateGPA(StudentProfile student) {
+        double totalQualityPoints = 0;
+        int totalCredits = 0;
+
+        for (Enrollment e : enrollmentList) {
+            if (e.getStudent().equals(student) && !e.getGrade().equals("NA")) {
+                double gradePoint = convertGradeToPoints(e.getGrade());
+                totalQualityPoints += (gradePoint * e.getCourse().getCredits());
+                totalCredits += e.getCourse().getCredits();
+            }
+        }
+
+        if (totalCredits == 0) return 0;
+        return totalQualityPoints / totalCredits;
+    }
+
+    /** Converts letter grade to GPA points. */
+    private double convertGradeToPoints(String grade) {
+        switch (grade.toUpperCase()) {
+            case "A":  return 4.0;
+            case "A-": return 3.7;
+            case "B+": return 3.3;
+            case "B":  return 3.0;
+            case "B-": return 2.7;
+            case "C+": return 2.3;
+            case "C":  return 2.0;
+            case "C-": return 1.7;
+            default:   return 0.0;
+        }
+    }
+}

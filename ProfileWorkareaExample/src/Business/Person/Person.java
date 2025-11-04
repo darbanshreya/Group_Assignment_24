@@ -1,44 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Business.Person;
 
 import java.util.UUID;
 
 /**
+ * Represents a generic person in the Digital University System.
+ * Used as a base entity for Students, Faculty, and Employees.
  *
  * @author Shreya
- * Represents a generic person in the Digital University System.
  */
 public class Person {
 
     private String personId;   // Unique ID
     private String name;
     private String email;
-    private String phone;
+    private String phoneNumber;
     private String department;
 
-    // Constructor for simple creation (auto-generate ID)
+    // ======== Constructors ========
+
+    /** Default constructor with only name (auto-generates ID) */
     public Person(String name) {
-        this.personId = UUID.randomUUID().toString(); // unique ID
+        this.personId = UUID.randomUUID().toString();
         this.name = name;
         this.email = "";
-        this.phone = "";
+        this.phoneNumber = "";
         this.department = "";
     }
 
-    // Constructor for full details
-    public Person(String name, String email, String phone, String department) {
+    /** Full constructor with details */
+    public Person(String name, String email, String phoneNumber, String department) {
         this.personId = UUID.randomUUID().toString();
         this.name = name;
         this.email = email;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
+        this.department = department;
+    }
+
+    /** Overloaded constructor allowing manual ID (for imports or DB sync) */
+    public Person(String personId, String name, String email, String phoneNumber, String department) {
+        this.personId = (personId != null && !personId.isEmpty()) ? personId : UUID.randomUUID().toString();
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
         this.department = department;
     }
 
     // ======== Getters ========
+
     public String getPersonId() {
         return personId;
     }
@@ -51,8 +59,8 @@ public class Person {
         return email;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public String getDepartment() {
@@ -60,6 +68,7 @@ public class Person {
     }
 
     // ======== Setters ========
+
     public void setName(String name) {
         this.name = name;
     }
@@ -68,8 +77,8 @@ public class Person {
         this.email = email;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void setDepartment(String department) {
@@ -77,12 +86,14 @@ public class Person {
     }
 
     // ======== Utility Methods ========
+
+    /** Match person by ID */
     public boolean isMatch(String id) {
         return this.personId.equals(id);
     }
 
     @Override
     public String toString() {
-        return name + " (" + personId + ")";
+        return name + " | " + email + " | ID: " + personId;
     }
 }

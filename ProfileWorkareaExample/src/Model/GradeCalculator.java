@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package Model;
+import Business.Profiles.StudentProfile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class GradeCalculator {
         else if (percentage >= 70) return "C-";
         else return "F";
     }
-    public static double calculateStudentTotalPercentage(Student student, Course course) {
+    public static double calculateStudentTotalPercentage(StudentProfile student, Course course) {
         List<Assignment> assignments = course.getAssignments();
         if (assignments.isEmpty()) return 0.0;
         
@@ -55,11 +56,11 @@ public class GradeCalculator {
         return totalPossible > 0 ? (totalEarned / totalPossible) * 100 : 0.0;
     }
     public static double calculateClassAverageGrade(Course course) {
-        List<Student> students = course.getEnrolledStudents();
+        List<StudentProfile> students = course.getEnrolledStudents();
         if (students.isEmpty()) return 0.0;
         
         double totalPercentage = 0;
-        for (Student student : students) {
+        for (StudentProfile student : students) {
             totalPercentage += calculateStudentTotalPercentage(student, course);
         }
         
@@ -77,7 +78,7 @@ public class GradeCalculator {
         distribution.put("C-", 0);
         distribution.put("F", 0);
         
-        for (Student student : course.getEnrolledStudents()) {
+        for (StudentProfile student : course.getEnrolledStudents()) {
             double percentage = calculateStudentTotalPercentage(student, course);
             String letterGrade = calculateLetterGrade(percentage);
             distribution.put(letterGrade, distribution.get(letterGrade) + 1);
