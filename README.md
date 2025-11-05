@@ -15,15 +15,6 @@ Pranav Waghmare- 002513911
   
 **Semester:** Fall 2025  
 
-**Team XX**  
-| Name | NUID | Role | Responsibilities |
-|------|------|------|------------------|
-| Shreya Darban | 002536747 | Student Developer | Student Use Case, UI workflow, Tuition & Transcript Module |
-| [Member 2 Name] | [NUID] | Admin Developer | Admin Panel, Account Management, Department Preload |
-| [Member 3 Name] | [NUID] | Faculty Developer | Course & Grade Module, Enrollment Integration |
-| [Member 4 Name (optional)] | [NUID] | Reviewer / Tester | Code Review, Bug Fixing, Documentation |
-
----
 
 ## 🧩 System Architecture
 
