@@ -9,7 +9,10 @@ It models a real-world university ecosystem, providing separate access and funct
 
 ## 👩‍💻 Team Information
 **Course:** INFO 5100 — Application Engineering & Development  
-**Instructor:** Prof. Yingying Zhuang  
+Darshan Patgar- 003151701
+Shreya Darban- 002536747
+Pranav Waghmare- 002513911
+  
 **Semester:** Fall 2025  
 
 **Team XX**  
